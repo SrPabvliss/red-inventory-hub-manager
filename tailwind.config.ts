@@ -61,7 +61,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+                // Colores institucionales
+                institutional: {
+                    red: '#ea384c',
+                    darkGray: '#222222',
+                    mediumGray: '#555555',
+                    lightGray: '#F1F1F1',
+                    coolGray: '#8E9196'
+                }
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
