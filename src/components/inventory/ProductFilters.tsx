@@ -32,19 +32,22 @@ export function ProductFilters({ onFilterChange }: ProductFiltersProps) {
     applyFilters(e.target.value, category, department, status);
   };
 
-  const handleCategoryChange = (value: ProductCategory | "") => {
-    setCategory(value);
-    applyFilters(search, value, department, status);
+  const handleCategoryChange = (value: string) => {
+    const categoryValue = value === "all_categories" ? "" : value as ProductCategory;
+    setCategory(categoryValue);
+    applyFilters(search, categoryValue, department, status);
   };
 
-  const handleDepartmentChange = (value: Department | "") => {
-    setDepartment(value);
-    applyFilters(search, category, value, status);
+  const handleDepartmentChange = (value: string) => {
+    const departmentValue = value === "all_departments" ? "" : value as Department;
+    setDepartment(departmentValue);
+    applyFilters(search, category, departmentValue, status);
   };
 
-  const handleStatusChange = (value: ProductStatus | "") => {
-    setStatus(value);
-    applyFilters(search, category, department, value);
+  const handleStatusChange = (value: string) => {
+    const statusValue = value === "all_statuses" ? "" : value as ProductStatus;
+    setStatus(statusValue);
+    applyFilters(search, category, department, statusValue);
   };
 
   const applyFilters = (
@@ -81,14 +84,14 @@ export function ProductFilters({ onFilterChange }: ProductFiltersProps) {
         </div>
 
         <Select
-          value={category}
-          onValueChange={(value) => handleCategoryChange(value as ProductCategory | "")}
+          value={category || "all_categories"}
+          onValueChange={handleCategoryChange}
         >
           <SelectTrigger>
             <SelectValue placeholder="Categoría" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todas las categorías</SelectItem>
+            <SelectItem value="all_categories">Todas las categorías</SelectItem>
             {Object.values(ProductCategory).map((cat) => (
               <SelectItem key={cat} value={cat}>
                 {cat === ProductCategory.TECHNOLOGY 
@@ -108,14 +111,14 @@ export function ProductFilters({ onFilterChange }: ProductFiltersProps) {
         </Select>
 
         <Select
-          value={department}
-          onValueChange={(value) => handleDepartmentChange(value as Department | "")}
+          value={department || "all_departments"}
+          onValueChange={handleDepartmentChange}
         >
           <SelectTrigger>
             <SelectValue placeholder="Departamento" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos los departamentos</SelectItem>
+            <SelectItem value="all_departments">Todos los departamentos</SelectItem>
             {Object.values(Department).map((dep) => (
               <SelectItem key={dep} value={dep}>
                 {dep === Department.COMPUTING
@@ -133,14 +136,14 @@ export function ProductFilters({ onFilterChange }: ProductFiltersProps) {
         </Select>
 
         <Select
-          value={status}
-          onValueChange={(value) => handleStatusChange(value as ProductStatus | "")}
+          value={status || "all_statuses"}
+          onValueChange={handleStatusChange}
         >
           <SelectTrigger>
             <SelectValue placeholder="Estado" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos los estados</SelectItem>
+            <SelectItem value="all_statuses">Todos los estados</SelectItem>
             {Object.values(ProductStatus).map((stat) => (
               <SelectItem key={stat} value={stat}>
                 {stat === ProductStatus.AVAILABLE
