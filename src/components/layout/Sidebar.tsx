@@ -23,12 +23,6 @@ export function Sidebar({ userRole = UserRole.ADMIN }: SidebarProps) {
 
   const sidebarItems = [
     {
-      title: "Panel Principal",
-      href: "/dashboard",
-      icon: LayoutDashboard,
-      roles: [UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT],
-    },
-    {
       title: "Inventario",
       href: "/inventory",
       icon: PackageSearch,
@@ -45,13 +39,7 @@ export function Sidebar({ userRole = UserRole.ADMIN }: SidebarProps) {
       href: "/loans",
       icon: Users,
       roles: [UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT],
-    },
-    {
-      title: "Notificaciones",
-      href: "/notifications",
-      icon: Bell,
-      roles: [UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT],
-    },
+    }
   ];
 
   const toggleSidebar = () => setCollapsed(!collapsed);
@@ -66,10 +54,10 @@ export function Sidebar({ userRole = UserRole.ADMIN }: SidebarProps) {
           "flex items-center gap-2 transition-all",
           collapsed && "hidden"
         )}>
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold">IT</span>
+          <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
+            <span className="text-primary-foreground font-bold">GITT</span>
           </div>
-          <h2 className="font-bold text-xl">InventTEC</h2>
+          <h2 className="font-bold text-lg">Gestión de Inventario Talleres Tecnológicos</h2>
         </div>
         <Button 
           variant="ghost" 

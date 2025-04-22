@@ -25,7 +25,7 @@ export default function Login() {
     // En una aplicación real, aquí haríamos la autenticación real
     // Por ahora simplemente simularemos un inicio de sesión exitoso
     localStorage.setItem("userRole", role);
-    navigate("/dashboard");
+    navigate("/inventory");
   };
 
   // Para demo solamente: cambiar rol para probar diferentes vistas
@@ -43,10 +43,10 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
       <div className="absolute top-10 left-10">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-xl">IT</span>
+          <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
+            <span className="text-primary-foreground font-bold text-xl">GITT</span>
           </div>
-          <h1 className="text-2xl font-bold">InventTEC</h1>
+          <h1 className="text-2xl font-bold">Gestión de Inventario Talleres Tecnológicos</h1>
         </div>
       </div>
 
