@@ -57,7 +57,7 @@ export function Sidebar({ userRole = UserRole.ADMIN }: SidebarProps) {
           <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-bold">GITT</span>
           </div>
-          <h2 className="font-bold text-lg">Gestión de Inventario Talleres Tecnológicos</h2>
+          {/* <h2 className="font-bold text-lg">Gestión de Inventario Talleres Tecnológicos</h2> */}
         </div>
         <Button 
           variant="ghost" 

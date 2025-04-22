@@ -1,8 +1,20 @@
-
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Product, ProductStatus } from "@/types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ProductCardProps {
   product: Product;
@@ -10,7 +22,11 @@ interface ProductCardProps {
   onViewClick?: (product: Product) => void;
 }
 
-export function ProductCard({ product, onLoanClick, onViewClick }: ProductCardProps) {
+export function ProductCard({
+  product,
+  onLoanClick,
+  onViewClick,
+}: ProductCardProps) {
   const statusColors = {
     [ProductStatus.AVAILABLE]: "bg-green-100 text-green-800",
     [ProductStatus.IN_USE]: "bg-blue-100 text-blue-800",
@@ -29,12 +45,12 @@ export function ProductCard({ product, onLoanClick, onViewClick }: ProductCardPr
             </p>
           </div>
           <Badge className={statusColors[product.status]} variant="outline">
-            {product.status === ProductStatus.IN_USE 
-              ? "En uso" 
-              : product.status === ProductStatus.AVAILABLE 
-              ? "Disponible" 
-              : product.status === ProductStatus.MAINTENANCE 
-              ? "En mantenimiento" 
+            {product.status === ProductStatus.IN_USE
+              ? "En uso"
+              : product.status === ProductStatus.AVAILABLE
+              ? "Disponible"
+              : product.status === ProductStatus.MAINTENANCE
+              ? "En mantenimiento"
               : "Dañado"}
           </Badge>
         </div>
@@ -42,8 +58,8 @@ export function ProductCard({ product, onLoanClick, onViewClick }: ProductCardPr
       <CardContent className="flex-grow py-2">
         <div className="aspect-video bg-muted rounded-md flex items-center justify-center mb-4 overflow-hidden">
           {product.imageUrl ? (
-            <img 
-              src={product.imageUrl} 
+            <img
+              src={product.imageUrl}
               alt={product.name}
               className="object-contain w-full h-full"
             />
@@ -61,30 +77,40 @@ export function ProductCard({ product, onLoanClick, onViewClick }: ProductCardPr
             <span className="text-sm font-medium">{product.quantity}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground pr-3">Descripción:</span>
+            <span className="text-sm text-muted-foreground pr-3">
+              Descripción:
+            </span>
             <span className="text-sm font-medium">{product.description}</span>
           </div>
         </div>
       </CardContent>
       <CardFooter className="pt-2 gap-2">
-        <Button 
-          variant="default" 
-          size="sm" 
+        <Button
+          variant="default"
+          size="sm"
           className="flex-1"
           onClick={() => onViewClick?.(product)}
         >
           Ver detalles
         </Button>
         {product.status === ProductStatus.AVAILABLE && (
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="flex-1"
             onClick={() => onLoanClick?.(product)}
           >
             Solicitar
           </Button>
         )}
+        <DropdownMenu>
+          <DropdownMenuTrigger>...</DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>Opciones</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Obtener información</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </CardFooter>
     </Card>
   );

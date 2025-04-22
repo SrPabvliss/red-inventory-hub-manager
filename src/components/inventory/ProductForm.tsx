@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -38,13 +37,14 @@ interface ProductFormValues {
   quantity: number;
   status: ProductStatus;
   cost: number;
+  isArchived: boolean;
   description: string;
 }
 
 export function ProductForm() {
   const [image, setImage] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
-  
+
   const form = useForm<ProductFormValues>({
     defaultValues: {
       barcode: "",
@@ -74,7 +74,10 @@ export function ProductForm() {
     // En un sistema real, aquí se activaría el lector de código de barras
     // Simulamos la lectura después de un breve retraso
     setTimeout(() => {
-      form.setValue("barcode", `INV-${Math.floor(1000000 + Math.random() * 9000000)}`);
+      form.setValue(
+        "barcode",
+        `INV-${Math.floor(1000000 + Math.random() * 9000000)}`
+      );
       setIsScanning(false);
     }, 2000);
   };
@@ -154,8 +157,8 @@ export function ProductForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Categoría</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
+                          <Select
+                            onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                             <FormControl>
@@ -192,8 +195,8 @@ export function ProductForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Departamento</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
+                          <Select
+                            onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                             <FormControl>
@@ -235,7 +238,9 @@ export function ProductForm() {
                               type="number"
                               min="1"
                               {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                              onChange={(e) =>
+                                field.onChange(parseInt(e.target.value) || 1)
+                              }
                             />
                           </FormControl>
                           <FormMessage />
@@ -249,8 +254,8 @@ export function ProductForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Estado</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
+                          <Select
+                            onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                             <FormControl>
@@ -283,14 +288,38 @@ export function ProductForm() {
                     name="cost"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Costo (USD)</FormLabel>
+                        <FormLabel>Costo Ingreso(USD)</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
                             step="0.01"
                             min="0"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || 0)
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="cost"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Costo Estimado(USD)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || 0)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -328,7 +357,10 @@ export function ProductForm() {
                         onChange={handleImageUpload}
                         className="hidden"
                       />
-                      <label htmlFor="productImage" className="cursor-pointer block">
+                      <label
+                        htmlFor="productImage"
+                        className="cursor-pointer block"
+                      >
                         {image ? (
                           <div className="aspect-video mx-auto flex items-center justify-center overflow-hidden">
                             <img
@@ -339,19 +371,85 @@ export function ProductForm() {
                           </div>
                         ) : (
                           <div className="flex flex-col items-center py-4">
-                            <Upload size={40} className="text-muted-foreground mb-2" />
-                            <p className="text-sm font-medium">Haga clic para subir una imagen</p>
-                            <p className="text-xs text-muted-foreground">O arrastre y suelte</p>
+                            <Upload
+                              size={40}
+                              className="text-muted-foreground mb-2"
+                            />
+                            <p className="text-sm font-medium">
+                              Haga clic para subir una imagen
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              O arrastre y suelte
+                            </p>
                           </div>
                         )}
                       </label>
                     </div>
                   </div>
+
+                  <FormField
+                    control={form.control}
+                    name="isArchived"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              id="isArchived"
+                              onChange={(e) => field.onChange(e.target.checked)}
+                              className="checkbox"
+                            />
+                            <FormLabel htmlFor="isArchived" className="mb-0">
+                              Dar de baja
+                            </FormLabel>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Procedencia</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Object.values(ProductStatus).map((stat) => (
+                              <SelectItem key={stat} value={stat}>
+                                {stat === ProductStatus.AVAILABLE
+                                  ? "Donacion"
+                                  : stat === ProductStatus.IN_USE
+                                  ? "Propiedad de la Institucion"
+                                  : stat === ProductStatus.MAINTENANCE}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </div>
 
               <div className="flex justify-end gap-2">
-                <Button variant="outline" type="reset" onClick={() => form.reset()}>
+                <Button
+                  variant="outline"
+                  type="reset"
+                  onClick={() => form.reset()}
+                >
                   Cancelar
                 </Button>
                 <Button type="submit">Registrar Producto</Button>
