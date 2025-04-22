@@ -61,8 +61,8 @@ export function ProductCard({ product, onLoanClick, onViewClick }: ProductCardPr
             <span className="text-sm font-medium">{product.quantity}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">Costo:</span>
-            <span className="text-sm font-medium">${product.cost.toFixed(2)}</span>
+            <span className="text-sm text-muted-foreground pr-3">Descripción:</span>
+            <span className="text-sm font-medium">{product.description}</span>
           </div>
         </div>
       </CardContent>
