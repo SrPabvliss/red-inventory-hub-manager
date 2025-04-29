@@ -13,8 +13,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, ArrowDownUp, Grid2X2, List, Plus } from "lucide-react";
 import { UserRole, Loan, Product, User } from "@/types";
+import { useNavigate } from "react-router-dom";
 
 // Datos de ejemplo para el prototipo
 const demoLoans: Loan[] = [
@@ -139,6 +140,8 @@ export default function Loans() {
   const [filteredLoans, setFilteredLoans] = useState<Loan[]>(demoLoans);
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState("grid");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedRole = localStorage.getItem("userRole") as UserRole;
@@ -198,8 +201,35 @@ export default function Loans() {
   return (
     <MainLayout title="Préstamos" userRole={userRole}>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Gestión de Préstamos</h2>
+      <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold">Gestion de préstamos</h2>
+          <div className="flex items-center gap-2">
+            <div className="border rounded-md flex">
+              <Button
+                variant={viewMode === "grid" ? "default" : "ghost"}
+                size="icon"
+                onClick={() => setViewMode("grid")}
+                className="rounded-r-none"
+              >
+                <Grid2X2 size={18} />
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "default" : "ghost"}
+                size="icon"
+                onClick={() => setViewMode("list")}
+                className="rounded-l-none"
+              >
+                <List size={18} />
+              </Button>
+            </div>
+
+            {userRole === UserRole.ADMIN && (
+              <Button onClick={() => navigate("/loans/new")} className="flex items-center gap-2">
+                <Plus size={18} />
+                <span>Registrar préstamo</span>
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="bg-white p-4 rounded-lg border shadow-sm">

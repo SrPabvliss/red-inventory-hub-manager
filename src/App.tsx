@@ -11,6 +11,7 @@ import Loans from "./pages/Loans";
 import { ProductForm } from "./components/inventory/ProductForm";
 import { MainLayout } from "./components/layout/MainLayout";
 import NotFound from "./pages/NotFound";
+import { NewLoanForm } from "./components/loans/NewLoanForm";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,11 @@ const App = () => (
             <MainLayout title="Registrar Producto">
               <ProductForm />
             </MainLayout>
+          } />
+          <Route path="/loans/new" element={
+            <MainLayout title="Solicitar Préstamo">
+              <NewLoanForm />
+           </MainLayout>
           } />
           <Route path="/notifications" element={
             <MainLayout title="Notificaciones">
