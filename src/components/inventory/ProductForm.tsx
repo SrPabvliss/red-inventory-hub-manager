@@ -29,6 +29,16 @@ import {
 import { Department, ProductCategory, ProductStatus } from "@/types";
 import { Barcode, Upload } from "lucide-react";
 
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+
 interface ProductFormValues {
   barcode: string;
   name: string;
@@ -39,6 +49,7 @@ interface ProductFormValues {
   cost: number;
   isArchived: boolean;
   description: string;
+  date: Date;
 }
 
 export function ProductForm() {
@@ -143,6 +154,83 @@ export function ProductForm() {
                           <Input
                             {...field}
                             placeholder="Ingrese el nombre del producto"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Serie/Identificación</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Ingrese el número de serie o identificación"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="date"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Fecha de Adquisición</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "w-[240px] pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Seleccione una fecha</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) =>
+                                date > new Date() ||
+                                date < new Date("1900-01-01")
+                              }
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Modelo</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Ingrese el nombre del modelo"
                           />
                         </FormControl>
                         <FormMessage />
@@ -342,6 +430,42 @@ export function ProductForm() {
                             {...field}
                           />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="custodian"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Responsable - Custodio</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccionar el responsable" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="almacen">
+                              Almacén Central
+                            </SelectItem>
+                            <SelectItem value="sistemas">
+                              Departamento de Sistemas
+                            </SelectItem>
+                            <SelectItem value="juan.perez">
+                              Juan Pérez
+                            </SelectItem>
+                            <SelectItem value="maria.gomez">
+                              María Gómez
+                            </SelectItem>
+                            <SelectItem value="otros">Otros</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
