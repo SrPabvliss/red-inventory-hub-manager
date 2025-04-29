@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { LoanCard } from "@/components/loans/LoanCard";
@@ -13,9 +12,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter, ArrowDownUp, Grid2X2, List, Plus } from "lucide-react";
+import { Search, Filter, ArrowDownUp, Grid2X2, List, Plus, Table } from "lucide-react";
 import { UserRole, Loan, Product, User } from "@/types";
 import { useNavigate } from "react-router-dom";
+import {
+  Table as ShadcnTable,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 // Datos de ejemplo para el prototipo
 const demoLoans: Loan[] = [
@@ -140,7 +147,7 @@ export default function Loans() {
   const [filteredLoans, setFilteredLoans] = useState<Loan[]>(demoLoans);
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list" | "table">("grid");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -198,11 +205,98 @@ export default function Loans() {
     alert(`Producto ${loan.product?.name} marcado como devuelto correctamente.`);
   };
 
+  const renderGridView = () => (
+    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      {filteredLoans.map(loan => (
+        <LoanCard
+          key={loan.id}
+          loan={loan}
+          onReturnClick={handleReturn}
+        />
+      ))}
+    </div>
+  );
+
+  const renderListView = () => (
+    <div className="space-y-4">
+      {filteredLoans.map(loan => (
+        <div key={loan.id} className="bg-white p-4 rounded-lg border shadow-sm">
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="font-semibold">{loan.product?.name}</h3>
+              <p className="text-sm text-gray-500">Código: {loan.product?.barcode}</p>
+              <p className="text-sm">Usuario: {loan.user?.name}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm">Inicio: {loan.startDate.toLocaleDateString()}</p>
+              <p className="text-sm">Vencimiento: {loan.dueDate.toLocaleDateString()}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleReturn(loan)}
+                className="mt-2"
+              >
+                Devolver
+              </Button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderTableView = () => (
+    <div className="border rounded-lg">
+      <ShadcnTable>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Producto</TableHead>
+            <TableHead>Código</TableHead>
+            <TableHead>Usuario</TableHead>
+            <TableHead>Fecha Inicio</TableHead>
+            <TableHead>Fecha Vencimiento</TableHead>
+            <TableHead>Estado</TableHead>
+            <TableHead>Acciones</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {filteredLoans.map(loan => (
+            <TableRow key={loan.id}>
+              <TableCell>{loan.product?.name}</TableCell>
+              <TableCell>{loan.product?.barcode}</TableCell>
+              <TableCell>{loan.user?.name}</TableCell>
+              <TableCell>{loan.startDate.toLocaleDateString()}</TableCell>
+              <TableCell>{loan.dueDate.toLocaleDateString()}</TableCell>
+              <TableCell>
+                <span className={`px-2 py-1 rounded-full text-xs ${
+                  loan.status === 'active' ? 'bg-green-100 text-green-800' :
+                  loan.status === 'returned' ? 'bg-blue-100 text-blue-800' :
+                  'bg-red-100 text-red-800'
+                }`}>
+                  {loan.status}
+                </span>
+              </TableCell>
+              <TableCell>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleReturn(loan)}
+                >
+                  Devolver
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </ShadcnTable>
+    </div>
+  );
+
   return (
     <MainLayout title="Préstamos" userRole={userRole}>
       <div className="space-y-6">
-      <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Gestion de préstamos</h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold">Gestión de préstamos</h2>
           <div className="flex items-center gap-2">
             <div className="border rounded-md flex">
               <Button
@@ -217,9 +311,17 @@ export default function Loans() {
                 variant={viewMode === "list" ? "default" : "ghost"}
                 size="icon"
                 onClick={() => setViewMode("list")}
-                className="rounded-l-none"
+                className="rounded-none"
               >
                 <List size={18} />
+              </Button>
+              <Button
+                variant={viewMode === "table" ? "default" : "ghost"}
+                size="icon"
+                onClick={() => setViewMode("table")}
+                className="rounded-l-none"
+              >
+                <Table size={18} />
               </Button>
             </div>
 
@@ -275,21 +377,17 @@ export default function Loans() {
           </Tabs>
         </div>
 
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {filteredLoans.map(loan => (
-            <LoanCard
-              key={loan.id}
-              loan={loan}
-              onReturnClick={handleReturn}
-            />
-          ))}
-
-          {filteredLoans.length === 0 && (
-            <div className="col-span-full text-center py-10">
-              <p className="text-muted-foreground">No se encontraron préstamos que coincidan con los filtros</p>
-            </div>
-          )}
-        </div>
+        {filteredLoans.length === 0 ? (
+          <div className="text-center py-10">
+            <p className="text-muted-foreground">No se encontraron préstamos que coincidan con los filtros</p>
+          </div>
+        ) : (
+          <>
+            {viewMode === "grid" && renderGridView()}
+            {viewMode === "list" && renderListView()}
+            {viewMode === "table" && renderTableView()}
+          </>
+        )}
       </div>
     </MainLayout>
   );
