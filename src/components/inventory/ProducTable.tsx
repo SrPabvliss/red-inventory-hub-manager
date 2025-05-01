@@ -1,4 +1,12 @@
 import { Product } from "@/types";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface ProductTableProps {
   products: Product[];
@@ -8,29 +16,37 @@ interface ProductTableProps {
 
 export function ProductTable({ products, onLoanClick, onViewClick }: ProductTableProps) {
   return (
-    <div className="overflow-auto border rounded-lg">
-      <table className="min-w-full text-sm">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-2 text-left">Código</th>
-            <th className="p-2 text-left">Nombre</th>
-            <th className="p-2 text-left">Categoría</th>
-            <th className="p-2 text-left">Departamento</th>
-            <th className="p-2 text-left">Cantidad</th>
-            <th className="p-2 text-left">Estado</th>
-            <th className="p-2 text-left">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div className="border rounded-lg">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Código</TableHead>
+            <TableHead>Nombre</TableHead>
+            <TableHead>Categoría</TableHead>
+            <TableHead>Departamento</TableHead>
+            <TableHead>Cantidad</TableHead>
+            <TableHead>Estado</TableHead>
+            <TableHead>Acciones</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {products.map((product) => (
-            <tr key={product.id} className="border-t">
-              <td className="p-2">{product.barcode}</td>
-              <td className="p-2">{product.name}</td>
-              <td className="p-2">{product.category}</td>
-              <td className="p-2">{product.department}</td>
-              <td className="p-2">{product.quantity}</td>
-              <td className="p-2">{product.status}</td>
-              <td className="p-2 space-x-2">
+            <TableRow key={product.id}>
+              <TableCell>{product.barcode}</TableCell>
+              <TableCell>{product.name}</TableCell>
+              <TableCell>{product.category}</TableCell>
+              <TableCell>{product.department}</TableCell>
+              <TableCell>{product.quantity}</TableCell>
+              <TableCell>
+                <span className={`px-2 py-1 rounded-full text-xs ${
+                  product.status === 'available' ? 'bg-green-100 text-green-800' :
+                  product.status === 'in_use' ? 'bg-blue-100 text-blue-800' :
+                  'bg-red-100 text-red-800'
+                }`}>
+                  {product.status}
+                </span>
+              </TableCell>
+              <TableCell className="space-x-2">
                 <button
                   onClick={() => onViewClick(product)}
                   className="text-blue-600 hover:underline"
@@ -43,11 +59,11 @@ export function ProductTable({ products, onLoanClick, onViewClick }: ProductTabl
                 >
                   Prestar
                 </button>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }
