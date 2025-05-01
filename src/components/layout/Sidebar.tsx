@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,8 @@ import {
   Users, 
   Bell, 
   LogOut,
-  Menu
+  Menu,
+  Handshake
 } from "lucide-react";
 import { UserRole } from "@/types";
 import { cn } from "@/lib/utils";
@@ -39,6 +39,12 @@ export function Sidebar({ userRole = UserRole.ADMIN }: SidebarProps) {
       href: "/loans",
       icon: Users,
       roles: [UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT],
+    },
+    {
+      title: "Registrar Préstamo",
+      href: "/loans/new",
+      icon: Handshake,
+      roles: [UserRole.ADMIN],
     }
   ];
 
