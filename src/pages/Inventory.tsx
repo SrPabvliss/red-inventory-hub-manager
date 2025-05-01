@@ -71,7 +71,7 @@ const demoProducts: Product[] = [
 
 export default function Inventory() {
   const [userRole, setUserRole] = useState<UserRole>(UserRole.ADMIN);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [products, setProducts] = useState<Product[]>(demoProducts);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(demoProducts);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
