@@ -117,6 +117,7 @@ export default function Inventory() {
     alert(`Ver detalles de: ${product.name}`);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleLoanSubmit = (data: any) => {
     console.log("Préstamo registrado:", data);
     setIsLoanFormOpen(false);
