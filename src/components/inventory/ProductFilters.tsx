@@ -68,10 +68,9 @@ export function ProductFilters({ onFilterChange }: ProductFiltersProps) {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg border shadow-sm mb-6">
-      <h3 className="font-medium mb-4">Filtros</h3>
+    <>
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-3">
         <div className="relative">
           <Input
             type="search"
@@ -159,15 +158,6 @@ export function ProductFilters({ onFilterChange }: ProductFiltersProps) {
         </Select>
       </div>
 
-      <div className="mt-4 flex justify-end">
-        <Button
-          variant="ghost"
-          onClick={resetFilters}
-          className="text-sm"
-        >
-          Limpiar filtros
-        </Button>
-      </div>
-    </div>
+      </>
   );
 }

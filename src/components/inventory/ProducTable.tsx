@@ -1,5 +1,14 @@
 import { Product, ProductCategory, Department, ProductStatus } from "@/types";
 import clsx from "clsx";
+import { Pencil, Trash2 } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface ProductTableProps {
   products: Product[];
@@ -15,6 +24,7 @@ const translateCategory = (category: ProductCategory) => {
     case ProductCategory.TOOLS: return "Herramientas";
     default: return category;
   }
+  
 };
 
 const translateDepartment = (department: Department) => {
@@ -48,50 +58,64 @@ const statusColor = (status: ProductStatus) => {
 
 export function ProductTable({ products, onLoanClick, onViewClick }: ProductTableProps) {
   return (
-    <div className="overflow-auto border rounded-lg">
-      <table className="min-w-full text-sm">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-3 text-left">Código</th>
-            <th className="p-3 text-left">Nombre</th>
-            <th className="p-3 text-left">Categoría</th>
-            <th className="p-3 text-left">Departamento</th>
-            <th className="p-3 text-left">Cantidad</th>
-            <th className="p-3 text-left">Estado</th>
-            <th className="p-3 text-left">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((product) => (
-            <tr key={product.id} className="border-t hover:bg-gray-50">
-              <td className="p-3">{product.barcode}</td>
-              <td className="p-3">{product.name}</td>
-              <td className="p-3">{translateCategory(product.category)}</td>
-              <td className="p-3">{translateDepartment(product.department)}</td>
-              <td className="p-3">{product.quantity}</td>
-              <td className="p-3">
-                <span className={statusColor(product.status)}>
-                  {translateStatus(product.status)}
-                </span>
-              </td>
-              <td className="p-3 space-x-2">
-                <button
-                  onClick={() => onViewClick(product)}
-                  className="text-blue-600 hover:underline"
-                >
-                  Ver
-                </button>
-                <button
-                  onClick={() => onLoanClick(product)}
-                  className="text-green-600 hover:underline"
-                >
-                  Prestar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Código</TableHead>
+          <TableHead>Nombre</TableHead>
+          <TableHead>Categoría</TableHead>
+          <TableHead>Departamento</TableHead>
+          <TableHead>Cantidad</TableHead>
+          <TableHead>Estado</TableHead>
+          <TableHead className="text-right">Acciones</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {products.map((product) => (
+          <TableRow key={product.id} className="hover:bg-muted">
+            <TableCell className="py-6">{product.barcode}</TableCell>
+            <TableCell className="py-2">{product.name}</TableCell>
+            <TableCell className="py-2">{translateCategory(product.category)}</TableCell>
+            <TableCell className="py-2">{translateDepartment(product.department)}</TableCell>
+            <TableCell className="py-2">{product.quantity}</TableCell>
+            <TableCell className="py-2">
+              <span className={statusColor(product.status)}>
+                {translateStatus(product.status)}
+              </span>
+            </TableCell>
+            <TableCell className="text-right space-x-2">
+              {/* <button
+                onClick={() => onViewClick(product)}
+                className="text-blue-600 hover:underline mr-2"
+                title="Ver"
+              >
+                Ver
+              </button>
+              <button
+                onClick={() => onLoanClick(product)}
+                className="text-green-600 hover:underline mr-2"
+                title="Prestar"
+              >
+                Prestar
+              </button> */}
+              <button
+                onClick={() => onViewClick(product)}
+                className="inline-flex items-center justify-center rounded hover:bg-muted p-1 mr-1"
+                title="Editar"
+              >
+                <Pencil className="h-4 w-4 " />
+              </button>
+              <button
+                onClick={() => onLoanClick(product)}
+                className="inline-flex items-center justify-center rounded hover:bg-muted p-1"
+                title="Eliminar"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }

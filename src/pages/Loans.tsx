@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter, ArrowDownUp, Grid2X2, List, Plus, Table } from "lucide-react";
+import { Search, Filter, ArrowDownUp, Grid2X2, List, Plus, Table, Package, Handshake } from "lucide-react";
 import { UserRole, Loan, Product, User } from "@/types";
 import { useNavigate } from "react-router-dom";
 import {
@@ -23,6 +23,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 // Datos de ejemplo para el prototipo
 const demoLoans: Loan[] = [
@@ -147,7 +149,9 @@ export default function Loans() {
   const [filteredLoans, setFilteredLoans] = useState<Loan[]>(demoLoans);
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "list" | "table">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list" | "table">("table");
+  const [page, setPage] = useState(1);
+  const pageSize = 8;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -205,9 +209,12 @@ export default function Loans() {
     alert(`Producto ${loan.product?.name} marcado como devuelto correctamente.`);
   };
 
+  const totalPages = Math.max(1, Math.ceil(filteredLoans.length / pageSize));
+  const paginatedLoans = filteredLoans.slice((page - 1) * pageSize, page * pageSize);
+
   const renderGridView = () => (
     <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-      {filteredLoans.map(loan => (
+      {paginatedLoans.map(loan => (
         <LoanCard
           key={loan.id}
           loan={loan}
@@ -219,7 +226,7 @@ export default function Loans() {
 
   const renderListView = () => (
     <div className="space-y-4">
-      {filteredLoans.map(loan => (
+      {paginatedLoans.map(loan => (
         <div key={loan.id} className="bg-white p-4 rounded-lg border shadow-sm">
           <div className="flex justify-between items-start">
             <div>
@@ -246,6 +253,7 @@ export default function Loans() {
   );
 
   const renderTableView = () => (
+    <>
     <div className="border rounded-lg">
       <ShadcnTable>
         <TableHeader>
@@ -260,7 +268,7 @@ export default function Loans() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredLoans.map(loan => (
+          {paginatedLoans.map(loan => (
             <TableRow key={loan.id}>
               <TableCell>{loan.product?.name}</TableCell>
               <TableCell>{loan.product?.barcode}</TableCell>
@@ -290,67 +298,64 @@ export default function Loans() {
         </TableBody>
       </ShadcnTable>
     </div>
+      <div className="flex justify-end items-center gap-2 mt-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setPage(page - 1)}
+          disabled={page === 1}
+        >
+          Anterior
+        </Button>
+        <span className="text-sm text-muted-foreground">
+          Página {page} de {totalPages}
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setPage(page + 1)}
+          disabled={page === totalPages}
+        >
+          Siguiente
+        </Button>
+      </div>
+      </>
   );
 
   return (
     <MainLayout title="Préstamos" userRole={userRole}>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Gestión de préstamos</h2>
-          <div className="flex items-center gap-2">
-            <div className="border rounded-md flex">
-              <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
-                size="icon"
-                onClick={() => setViewMode("grid")}
-                className="rounded-r-none"
-              >
-                <Grid2X2 size={18} />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
-                size="icon"
-                onClick={() => setViewMode("list")}
-                className="rounded-none"
-              >
-                <List size={18} />
-              </Button>
-              <Button
-                variant={viewMode === "table" ? "default" : "ghost"}
-                size="icon"
-                onClick={() => setViewMode("table")}
-                className="rounded-l-none"
-              >
-                <Table size={18} />
-              </Button>
-            </div>
-
-            {userRole === UserRole.ADMIN && (
-              <Button onClick={() => navigate("/loans/new")} className="flex items-center gap-2">
-                <Plus size={18} />
-                <span>Registrar préstamo</span>
-              </Button>
-            )}
+      <div className="flex flex-col items-center space-y-6 px-6 md:px-12 w-full">
+        <div className="mb-2 w-[1200px] min-w-[1200px] max-w-[1200px] mx-auto">
+          <div className="mb-6">
+          <Breadcrumb className="mb-6">
+            <BreadcrumbList>
+            <BreadcrumbItem>
+              <span className="text-muted-foreground font-medium">Operaciones</span>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <Handshake className="inline mr-1 h-4 w-4 text-primary align-middle" />
+                <BreadcrumbPage>Préstamos</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+            <h2 className="text-2xl font-bold tracking-tight">Gestión de Préstamos</h2>
+            <p className="text-muted-foreground">Consulta y administra todos los préstamos registrados en el sistema</p>
           </div>
         </div>
-
-        <div className="bg-white p-4 rounded-lg border shadow-sm">
-          <div className="flex flex-col sm:flex-row gap-4 mb-4">
-            <div className="flex-grow relative">
-              <Input
-                type="search"
-                placeholder="Buscar por nombre, código o usuario..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-              />
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            </div>
-            
-            <div className="flex gap-2">
-              <div className="w-40">
+        <Card className="w-[1200px] min-w-[1200px] max-w-[1200px] mx-auto">
+          <CardHeader className="px-4 md:px-8 pb-0">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex flex-col md:flex-row gap-2 md:gap-4 w-full md:w-auto py-2 mb-4">
+                <Input
+                  type="search"
+                  placeholder="Buscar por nombre, código o usuario..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 w-full md:w-64"
+                />
                 <Select>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full md:w-56">
                     <SelectValue placeholder="Ordenar por" />
                   </SelectTrigger>
                   <SelectContent>
@@ -360,34 +365,69 @@ export default function Loans() {
                     <SelectItem value="name-desc">Nombre Z-A</SelectItem>
                   </SelectContent>
                 </Select>
+                <Select value={activeTab} onValueChange={setActiveTab}>
+                  <SelectTrigger className="w-full md:w-56">
+                    <SelectValue placeholder="Todos los estados" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="active">Activos</SelectItem>
+                    <SelectItem value="returned">Devueltos</SelectItem>
+                    <SelectItem value="overdue">Vencidos</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <Button variant="outline" size="icon">
-                <Filter size={18} />
-              </Button>
+              <div className="flex items-center gap-2">
+                <div className="border rounded-md flex">
+                  <Button
+                    variant={viewMode === "table" ? "default" : "ghost"}
+                    size="icon"
+                    onClick={() => setViewMode("table")}
+                    className="rounded-r-none"
+                  >
+                    <ArrowDownUp size={18} />
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "ghost"}
+                    size="icon"
+                    onClick={() => setViewMode("list")}
+                    className="rounded-none"
+                  >
+                    <List size={18} />
+                  </Button>
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    size="icon"
+                    onClick={() => setViewMode("grid")}
+                    className="rounded-l-none"
+                  >
+                    <Grid2X2 size={18} />
+                  </Button>
+                </div>
+                {userRole === UserRole.ADMIN && (
+                  <Button onClick={() => navigate("/loans/new")} className="flex items-center gap-2">
+                    <Plus size={18} />
+                    <span>Registrar préstamo</span>
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
-
-          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList>
-              <TabsTrigger value="all">Todos</TabsTrigger>
-              <TabsTrigger value="active">Activos</TabsTrigger>
-              <TabsTrigger value="returned">Devueltos</TabsTrigger>
-              <TabsTrigger value="overdue">Vencidos</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-
-        {filteredLoans.length === 0 ? (
-          <div className="text-center py-10">
-            <p className="text-muted-foreground">No se encontraron préstamos que coincidan con los filtros</p>
-          </div>
-        ) : (
-          <>
-            {viewMode === "grid" && renderGridView()}
-            {viewMode === "list" && renderListView()}
-            {viewMode === "table" && renderTableView()}
-          </>
-        )}
+            <hr className="border-t border-muted" />
+          </CardHeader>
+          <CardContent className="px-4 md:px-8 pb-6">
+            {filteredLoans.length === 0 ? (
+              <div className="text-center py-10">
+                <p className="text-muted-foreground">No se encontraron préstamos que coincidan con los filtros</p>
+              </div>
+            ) : (
+              <>
+                {viewMode === "grid" && renderGridView()}
+                {viewMode === "list" && renderListView()}
+                {viewMode === "table" && renderTableView()}
+              </>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </MainLayout>
   );
