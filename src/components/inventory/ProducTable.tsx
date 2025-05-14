@@ -1,6 +1,6 @@
 import { Product, ProductCategory, Department, ProductStatus } from "@/types";
 import clsx from "clsx";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Barcode } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -9,6 +9,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 interface ProductTableProps {
   products: Product[];
@@ -16,7 +25,6 @@ interface ProductTableProps {
   onViewClick: (product: Product) => void;
 }
 
-// Utilidades de traducción
 const translateCategory = (category: ProductCategory) => {
   switch (category) {
     case ProductCategory.TECHNOLOGY: return "Tecnología";
@@ -24,7 +32,6 @@ const translateCategory = (category: ProductCategory) => {
     case ProductCategory.TOOLS: return "Herramientas";
     default: return category;
   }
-  
 };
 
 const translateDepartment = (department: Department) => {
@@ -44,7 +51,6 @@ const translateStatus = (status: ProductStatus) => {
   }
 };
 
-// Clases de colores para los estados
 const statusColor = (status: ProductStatus) => {
   return clsx(
     "inline-block px-2 py-1 rounded-full text-xs font-medium",
@@ -57,65 +63,96 @@ const statusColor = (status: ProductStatus) => {
 };
 
 export function ProductTable({ products, onLoanClick, onViewClick }: ProductTableProps) {
+  const [isScanning, setIsScanning] = useState(false);
+
+  const handleScanComplete = (barcode: string) => {
+    console.log("Código de barras escaneado:", barcode);
+    setIsScanning(false);
+  };
+
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Código</TableHead>
-          <TableHead>Nombre</TableHead>
-          <TableHead>Categoría</TableHead>
-          <TableHead>Departamento</TableHead>
-          <TableHead>Cantidad</TableHead>
-          <TableHead>Estado</TableHead>
-          <TableHead className="text-right">Acciones</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {products.map((product) => (
-          <TableRow key={product.id} className="hover:bg-muted">
-            <TableCell className="py-6">{product.barcode}</TableCell>
-            <TableCell className="py-2">{product.name}</TableCell>
-            <TableCell className="py-2">{translateCategory(product.category)}</TableCell>
-            <TableCell className="py-2">{translateDepartment(product.department)}</TableCell>
-            <TableCell className="py-2">{product.quantity}</TableCell>
-            <TableCell className="py-2">
-              <span className={statusColor(product.status)}>
-                {translateStatus(product.status)}
-              </span>
-            </TableCell>
-            <TableCell className="text-right space-x-2">
-              {/* <button
-                onClick={() => onViewClick(product)}
-                className="text-blue-600 hover:underline mr-2"
-                title="Ver"
-              >
-                Ver
-              </button>
-              <button
-                onClick={() => onLoanClick(product)}
-                className="text-green-600 hover:underline mr-2"
-                title="Prestar"
-              >
-                Prestar
-              </button> */}
-              <button
-                onClick={() => onViewClick(product)}
-                className="inline-flex items-center justify-center rounded hover:bg-muted p-1 mr-1"
-                title="Editar"
-              >
-                <Pencil className="h-4 w-4 " />
-              </button>
-              <button
-                onClick={() => onLoanClick(product)}
-                className="inline-flex items-center justify-center rounded hover:bg-muted p-1"
-                title="Eliminar"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <div className="w-full">
+      <div className="flex justify-end mb-4">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="ml-2 whitespace-nowrap">
+              <Barcode className="h-4 w-4 mr-2" />
+              Escanear código de barras
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Escanear código de barras</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <div className="border-2 border-dashed rounded-lg p-8 text-center">
+                <p>Área de escaneo de código de barras</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Coloca el código de barras frente a la cámara
+                </p>
+              </div>
+              <div className="mt-4 flex justify-end">
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleScanComplete("1234567890")}
+                >
+                  Simular escaneo
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+      
+      <div className="rounded-md border">
+        <div className="w-full overflow-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="whitespace-nowrap">Código</TableHead>
+                <TableHead className="whitespace-nowrap">Nombre</TableHead>
+                <TableHead className="whitespace-nowrap">Categoría</TableHead>
+                <TableHead className="whitespace-nowrap">Departamento</TableHead>
+                <TableHead className="whitespace-nowrap">Cantidad</TableHead>
+                <TableHead className="whitespace-nowrap">Estado</TableHead>
+                <TableHead className="text-right whitespace-nowrap">Acciones</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products.map((product) => (
+                <TableRow key={product.id} className="hover:bg-muted">
+                  <TableCell className="py-4 whitespace-nowrap">{product.barcode}</TableCell>
+                  <TableCell className="py-4 whitespace-nowrap">{product.name}</TableCell>
+                  <TableCell className="py-4 whitespace-nowrap">{translateCategory(product.category)}</TableCell>
+                  <TableCell className="py-4 whitespace-nowrap">{translateDepartment(product.department)}</TableCell>
+                  <TableCell className="py-4 whitespace-nowrap">{product.quantity}</TableCell>
+                  <TableCell className="py-4 whitespace-nowrap">
+                    <span className={statusColor(product.status)}>
+                      {translateStatus(product.status)}
+                    </span>
+                  </TableCell>
+                  <TableCell className="py-4 text-right space-x-2 whitespace-nowrap">
+                    <button
+                      onClick={() => onViewClick(product)}
+                      className="inline-flex items-center justify-center rounded hover:bg-muted p-1 mr-1"
+                      title="Editar"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => onLoanClick(product)}
+                      className="inline-flex items-center justify-center rounded hover:bg-muted p-1"
+                      title="Eliminar"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    </div>
   );
 }
