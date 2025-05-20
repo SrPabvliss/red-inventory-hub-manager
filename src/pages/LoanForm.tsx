@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Handshake, Search, Tags, Clock } from "lucide-react";
+import { CalendarIcon, Handshake, Search, Tags, Clock, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -23,6 +23,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Breadcrumb, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage, BreadcrumbItem, BreadcrumbList } from "@/components/ui/breadcrumb";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function LoanFormPage() {
   const navigate = useNavigate();
@@ -49,6 +56,56 @@ export default function LoanFormPage() {
     { id: "3", nombre: "Arduino Starter Kit", barcode: "TEC-003" },
   ]);
 
+  // Lista de estudiantes morosos/inconvenientes
+  const [listaNegra, setListaNegra] = useState([
+    {
+      id: "1",
+      nombres: "Juan Pérez",
+      apellidos: "Gómez",
+      cedula: "123456789",
+      correo: "juan.perez@example.com",
+      telefono: "3001234567",
+      rol: "estudiante",
+      motivo: "Devolución tardía en 3 ocasiones",
+      fechaIncidente: "2023-10-15",
+      sancion: "Sin préstamos por 3 meses"
+    },
+    {
+      id: "2",
+      nombres: "María López",
+      apellidos: "Rodríguez",
+      cedula: "987654321",
+      correo: "maria.lopez@example.com",
+      telefono: "3109876543",
+      rol: "estudiante",
+      motivo: "Daño a equipo prestado",
+      fechaIncidente: "2023-11-20",
+      sancion: "Sin préstamos por 6 meses"
+    },
+    {
+      id: "3",
+      nombres: "Carlos Sánchez",
+      apellidos: "Martínez",
+      cedula: "456123789",
+      correo: "carlos.sanchez@example.com",
+      telefono: "3204567890",
+      rol: "docente",
+      motivo: "No devolvió material",
+      fechaIncidente: "2023-12-05",
+      sancion: "Sin préstamos por 1 año"
+    }
+  ]);
+
+  // Estado para el buscador de la lista negra
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filtrar lista negra según el término de búsqueda
+  const filteredListaNegra = listaNegra.filter(persona => 
+    persona.nombres.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    persona.apellidos.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    persona.cedula.includes(searchTerm)
+  );
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -63,7 +120,6 @@ export default function LoanFormPage() {
 
   const handleDateChange = (date, field) => {
     if (date) {
-      // Mantener la hora existente cuando solo cambiamos la fecha
       const existingDate = formData[field];
       const newDate = new Date(date);
       
@@ -92,6 +148,18 @@ export default function LoanFormPage() {
     setShowBienResults(false);
   };
 
+  const handleSelectFromList = (estudiante) => {
+    setFormData({
+      ...formData,
+      nombres: estudiante.nombres,
+      apellidos: estudiante.apellidos,
+      cedula: estudiante.cedula,
+      correo: estudiante.correo,
+      telefono: estudiante.telefono,
+      rol: estudiante.rol
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     alert("Solicitud de préstamo enviada correctamente");
@@ -99,23 +167,99 @@ export default function LoanFormPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto ">
-        <Breadcrumb className="mb-6">
-            <BreadcrumbList>
+    <div className="max-w-6xl mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <Breadcrumb>
+          <BreadcrumbList>
             <BreadcrumbItem>
-                <span className="text-muted-foreground font-medium">Operaciones</span>
+              <span className="text-muted-foreground font-medium">Operaciones</span>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-                <Handshake className="inline mr-1 h-4 w-4 text-primary align-middle" />
-                <BreadcrumbLink href="/loans">Préstamos</BreadcrumbLink>
+              <Handshake className="inline mr-1 h-4 w-4 text-primary align-middle" />
+              <BreadcrumbLink href="/loans">Préstamos</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-                <BreadcrumbPage>{"Nuevo Préstamo"}</BreadcrumbPage>
+              <BreadcrumbPage>{"Nuevo Préstamo"}</BreadcrumbPage>
             </BreadcrumbItem>
-            </BreadcrumbList>
-        </Breadcrumb> 
+          </BreadcrumbList>
+        </Breadcrumb>
+        
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="destructive" className="flex items-center gap-2">
+              <AlertCircle className="h-4 w-4" />
+              Lista Negra
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl">Lista Negra de Estudiantes</DialogTitle>
+              <p className="text-sm text-muted-foreground">
+                Personas con historial de morosidad o problemas con devoluciones
+              </p>
+            </DialogHeader>
+            
+            {/* Buscador para la lista negra */}
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por nombre, apellido o cédula..."
+                className="pl-10"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-4">
+              {filteredListaNegra.length > 0 ? (
+                filteredListaNegra.map((estudiante) => (
+                  <Card key={estudiante.id} className="border-red-200 bg-red-50">
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-lg">
+                            {estudiante.nombres} {estudiante.apellidos}
+                          </CardTitle>
+                          <p className="text-sm text-muted-foreground">
+                            Cédula: {estudiante.cedula} | {estudiante.rol}
+                          </p>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="font-medium text-sm">Motivo:</p>
+                          <p className="text-red-600">{estudiante.motivo}</p>
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Sanción:</p>
+                          <p>{estudiante.sancion}</p>
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Fecha incidente:</p>
+                          <p>{estudiante.fechaIncidente}</p>
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Contacto:</p>
+                          <p>{estudiante.correo} | {estudiante.telefono}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No se encontraron resultados</p>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
       <form onSubmit={handleSubmit}>
         <div className="space-y-10">
           {/* Sección Solicitante */}
