@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Handshake, Search, Tags } from "lucide-react";
+import { CalendarIcon, Handshake, Search, Tags, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -37,6 +37,7 @@ export default function LoanFormPage() {
     motivo: "",
     evento: "",
     ubicacion: "",
+    fechaPrestamo: new Date(),
     fechaDevolucion: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     notas: "",
     acepta: false,
@@ -60,8 +61,26 @@ export default function LoanFormPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleDateChange = (date) => {
-    if (date) setFormData((prev) => ({ ...prev, fechaDevolucion: date }));
+  const handleDateChange = (date, field) => {
+    if (date) {
+      // Mantener la hora existente cuando solo cambiamos la fecha
+      const existingDate = formData[field];
+      const newDate = new Date(date);
+      
+      if (existingDate) {
+        newDate.setHours(existingDate.getHours());
+        newDate.setMinutes(existingDate.getMinutes());
+      }
+      
+      setFormData((prev) => ({ ...prev, [field]: newDate }));
+    }
+  };
+
+  const handleTimeChange = (time, field) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const newDate = new Date(formData[field]);
+    newDate.setHours(hours, minutes);
+    setFormData((prev) => ({ ...prev, [field]: newDate }));
   };
 
   const handleBienSearch = () => {
@@ -208,32 +227,79 @@ export default function LoanFormPage() {
                         <label className="block mb-1 font-medium" htmlFor="ubicacion">Ubicación de Uso (opcional)</label>
                         <Input id="ubicacion" name="ubicacion" value={formData.ubicacion} onChange={handleInputChange} className="w-full" />
                       </div>
+                      
+                      {/* Nuevo campo: Fecha de Préstamo con hora */}
                       <div>
-                        <label className="block mb-1 font-medium">Fecha de Devolución Programada</label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !formData.fechaDevolucion && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {formData.fechaDevolucion ? format(formData.fechaDevolucion, "PPP") : <span>Seleccionar fecha</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <Calendar
-                              mode="single"
-                              selected={formData.fechaDevolucion}
-                              onSelect={handleDateChange}
-                              disabled={(date) => date < new Date()}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        <label className="block mb-1 font-medium">Fecha y Hora de Préstamo</label>
+                        <div className="flex gap-2">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !formData.fechaPrestamo && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {formData.fechaPrestamo ? format(formData.fechaPrestamo, "PPP") : <span>Seleccionar fecha</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                              <Calendar
+                                mode="single"
+                                selected={formData.fechaPrestamo}
+                                onSelect={(date) => handleDateChange(date, "fechaPrestamo")}
+                                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <Input
+                            type="time"
+                            value={format(formData.fechaPrestamo, "HH:mm")}
+                            onChange={(e) => handleTimeChange(e.target.value, "fechaPrestamo")}
+                            className="w-32"
+                          />
+                        </div>
                       </div>
+                      
+                      {/* Campo existente: Fecha de Devolución con hora */}
+                      <div>
+                        <label className="block mb-1 font-medium">Fecha y Hora de Devolución Programada</label>
+                        <div className="flex gap-2">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !formData.fechaDevolucion && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {formData.fechaDevolucion ? format(formData.fechaDevolucion, "PPP") : <span>Seleccionar fecha</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                              <Calendar
+                                mode="single"
+                                selected={formData.fechaDevolucion}
+                                onSelect={(date) => handleDateChange(date, "fechaDevolucion")}
+                                disabled={(date) => date < formData.fechaPrestamo}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <Input
+                            type="time"
+                            value={format(formData.fechaDevolucion, "HH:mm")}
+                            onChange={(e) => handleTimeChange(e.target.value, "fechaDevolucion")}
+                            className="w-32"
+                          />
+                        </div>
+                      </div>
+                      
                       <div>
                         <label className="block mb-1 font-medium" htmlFor="notas">Notas Adicionales</label>
                         <Textarea id="notas" name="notas" value={formData.notas} onChange={handleInputChange} className="w-full" />
@@ -262,4 +328,4 @@ export default function LoanFormPage() {
       </form>
     </div>
   );
-} 
+}
